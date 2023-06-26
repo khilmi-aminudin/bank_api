@@ -4,7 +4,10 @@ postgresql :
 	docker run --name postgresql -p 5432:5432 -e TZ=Asia/Jakarta -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres
 
 execdb :
-	docker exec -it postgresql psql bank_db
+	docker exec -it postgresql psql -d bank_db
+
+uuid-db :
+	docker exec -it postgresql psql -d bank_db -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
 
 createdb :
 	docker exec -it postgresql createdb --username=root --owner=root bank_db
@@ -49,6 +52,6 @@ build:
 	docker build -t ewallet .
 
 mock :
-	mockery --name=Store --dir=db/sqlc --output=db/mocks --outpkg=dbmocks
+	mockery --name=Store --dir=./repositories --output=db/mocks --outpkg=mocks
 
 .PHONY : postgresql execdb createdb initmigrate migrateup migratedown migrateup1 migratedown1 sqlc db_docs db_schema test runserver mock

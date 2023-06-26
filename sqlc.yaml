@@ -1,7 +1,7 @@
 version: 1
 packages:
-  - path: "./db/sqlc/"
-    name: "db"
+  - path: "./repositories"
+    name: "repositories"
     engine: "postgresql"
     schema: "./db/migrations/"
     queries: "./db/queries"
@@ -10,9 +10,11 @@ packages:
     emit_interface: true
     emit_exact_table_names: false
     emit_empty_slices: true
-# overrides:
-#   - go_type: float64
-#     column: "wallets.balance"
+overrides:
+  - go_type: float64
+    column: "m_account.balance"
+  - go_type: float64
+    column: "transaction_history.amount"
 #   - go_type: float64
 #     column: "transactions.amount"
 #   - go_type: string

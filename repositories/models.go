@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.18.0
 
-package db
+package repositories
 
 import (
 	"database/sql/driver"
@@ -99,46 +99,47 @@ func (ns NullIDCardType) Value() (driver.Value, error) {
 	return string(ns.IDCardType), nil
 }
 
-type TransactionStatus string
+type Role string
 
 const (
-	TransactionStatusSuccess TransactionStatus = "success"
-	TransactionStatusFailed  TransactionStatus = "failed"
+	RoleUser     Role = "user"
+	RoleAdmin    Role = "admin"
+	RoleEmployee Role = "employee"
 )
 
-func (e *TransactionStatus) Scan(src interface{}) error {
+func (e *Role) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = TransactionStatus(s)
+		*e = Role(s)
 	case string:
-		*e = TransactionStatus(s)
+		*e = Role(s)
 	default:
-		return fmt.Errorf("unsupported scan type for TransactionStatus: %T", src)
+		return fmt.Errorf("unsupported scan type for Role: %T", src)
 	}
 	return nil
 }
 
-type NullTransactionStatus struct {
-	TransactionStatus TransactionStatus
-	Valid             bool // Valid is true if TransactionStatus is not NULL
+type NullRole struct {
+	Role  Role
+	Valid bool // Valid is true if Role is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullTransactionStatus) Scan(value interface{}) error {
+func (ns *NullRole) Scan(value interface{}) error {
 	if value == nil {
-		ns.TransactionStatus, ns.Valid = "", false
+		ns.Role, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.TransactionStatus.Scan(value)
+	return ns.Role.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullTransactionStatus) Value() (driver.Value, error) {
+func (ns NullRole) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.TransactionStatus), nil
+	return string(ns.Role), nil
 }
 
 type TransactionType string
@@ -186,15 +187,16 @@ func (ns NullTransactionType) Value() (driver.Value, error) {
 }
 
 type MAccount struct {
-	ID         uuid.UUID   `json:"id"`
-	CustomerID uuid.UUID   `json:"customer_id"`
-	Number     string      `json:"number"`
-	Balance    interface{} `json:"balance"`
-	CreatedAt  time.Time   `json:"created_at"`
+	ID         uuid.UUID `json:"id"`
+	CustomerID uuid.UUID `json:"customer_id"`
+	Number     string    `json:"number"`
+	Balance    float64   `json:"balance"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type MCustomer struct {
 	ID           uuid.UUID    `json:"id"`
+	Role         Role         `json:"role"`
 	IDCardType   IDCardType   `json:"id_card_type"`
 	IDCardNumber string       `json:"id_card_number"`
 	FirstName    string       `json:"first_name"`
@@ -209,24 +211,23 @@ type MCustomer struct {
 }
 
 type MMerchant struct {
-	ID        uuid.UUID   `json:"id"`
-	Name      string      `json:"name"`
-	Balance   interface{} `json:"balance"`
-	Address   string      `json:"address"`
-	Website   string      `json:"website"`
-	Email     string      `json:"email"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Balance   string    `json:"balance"`
+	Address   string    `json:"address"`
+	Website   string    `json:"website"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type TransactionHistory struct {
-	ID              uuid.UUID         `json:"id"`
-	TransactionType TransactionType   `json:"transaction_type"`
-	FromAccountID   uuid.UUID         `json:"from_account_id"`
-	ToAccountID     uuid.NullUUID     `json:"to_account_id"`
-	ToMerchantID    uuid.NullUUID     `json:"to_merchant_id"`
-	Amount          interface{}       `json:"amount"`
-	Description     string            `json:"description"`
-	Status          TransactionStatus `json:"status"`
-	CreatedAt       time.Time         `json:"created_at"`
+	ID              uuid.UUID       `json:"id"`
+	TransactionType TransactionType `json:"transaction_type"`
+	FromAccountID   uuid.UUID       `json:"from_account_id"`
+	ToAccountID     uuid.NullUUID   `json:"to_account_id"`
+	ToMerchantID    uuid.NullUUID   `json:"to_merchant_id"`
+	Amount          float64         `json:"amount"`
+	Description     string          `json:"description"`
+	CreatedAt       time.Time       `json:"created_at"`
 }

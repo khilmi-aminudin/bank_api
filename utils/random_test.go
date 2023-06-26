@@ -12,23 +12,9 @@ func TestRandomInt(t *testing.T) {
 	require.LessOrEqual(t, randomInt, int64(100))
 }
 
-func TestRandomOwner(t *testing.T) {
-	owner := RandomOwner()
+func TestRandomUsername(t *testing.T) {
+	owner := RandomUsername()
 	require.Equal(t, 5, len(owner))
-}
-
-func TestRandomMoney(t *testing.T) {
-	randomInt := RandomMoney()
-	require.GreaterOrEqual(t, randomInt, int64(1000))
-	require.LessOrEqual(t, randomInt, int64(100000))
-}
-
-func TestRandomCurrency(t *testing.T) {
-	availableCurrencies := []string{"RUB", "USD", "CAD", "EUR", "IDR"}
-	curency := RandomCurrency()
-
-	require.Equal(t, 3, len(curency))
-	require.Contains(t, availableCurrencies, curency)
 }
 
 func TestRandomEmail(t *testing.T) {
