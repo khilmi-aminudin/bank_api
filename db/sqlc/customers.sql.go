@@ -10,7 +10,7 @@ import (
 )
 
 const getAllCustomers = `-- name: GetAllCustomers :many
-SELECT id, id_card_type, id_card_number, first_name, last_name, phone_number, email, status, created_at, updated_at FROM m_customer
+SELECT id, id_card_type, id_card_number, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at FROM m_customer
 `
 
 func (q *Queries) GetAllCustomers(ctx context.Context) ([]MCustomer, error) {
@@ -30,6 +30,8 @@ func (q *Queries) GetAllCustomers(ctx context.Context) ([]MCustomer, error) {
 			&i.LastName,
 			&i.PhoneNumber,
 			&i.Email,
+			&i.Username,
+			&i.Password,
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,

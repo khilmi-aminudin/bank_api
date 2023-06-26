@@ -31,6 +31,8 @@ CREATE TABLE "m_customer" (
   "last_name" VARCHAR(20) NOT NULL,
   "phone_number" VARCHAR(13) NOT NULL,
   "email" VARCHAR(100) NOT NULL,
+  "username" VARCHAR(100) UNIQUE NOT NULL,
+  "password" VARCHAR(255) NOT NULL,
   "status" customer_enum NOT NULL DEFAULT 'pending',
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT 'NOW()',
   "updated_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01'
@@ -66,6 +68,8 @@ CREATE TABLE "transaction_history" (
   "status" transaction_status NOT NULL,
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT 'NOW()'
 );
+
+CREATE INDEX ON "m_customer" ("username");
 
 CREATE INDEX ON "m_customer" ("id_card_number");
 

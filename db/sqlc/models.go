@@ -201,6 +201,8 @@ type MCustomer struct {
 	LastName     string       `json:"last_name"`
 	PhoneNumber  string       `json:"phone_number"`
 	Email        string       `json:"email"`
+	Username     string       `json:"username"`
+	Password     string       `json:"password"`
 	Status       CustomerEnum `json:"status"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
