@@ -1,0 +1,6 @@
+app.env
+build/
+
+*.csv
+tmp/
+.log
