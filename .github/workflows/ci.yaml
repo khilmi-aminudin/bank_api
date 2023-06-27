@@ -46,7 +46,6 @@ jobs:
 
     - name: Run migrations
       run: |
-        psql -h localhost -p 5432 -U root -d bank_db -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         make migrateup
 
     - name: Test
