@@ -52,6 +52,6 @@ build:
 	docker build -t ewallet .
 
 mock :
-	mockery --name=Store --dir=./repositories --output=db/mocks --outpkg=mocks
+	mockery --name=Repository --dir=./repositories --output=db/mocks --outpkg=mocks
 
 .PHONY : postgresql execdb createdb initmigrate migrateup migratedown migrateup1 migratedown1 sqlc db_docs db_schema test runserver mock

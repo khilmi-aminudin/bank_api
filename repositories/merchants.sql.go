@@ -7,6 +7,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -19,7 +20,7 @@ RETURNING id, name, balance, address, website, email, created_at, updated_at
 `
 
 type AddMerchantBalanceParams struct {
-	Balance string    `json:"balance"`
+	Balance float64   `json:"balance"`
 	ID      uuid.UUID `json:"id"`
 }
 
@@ -158,15 +159,16 @@ func (q *Queries) GetMerchantByName(ctx context.Context, name string) (MMerchant
 
 const updateMerchant = `-- name: UpdateMerchant :exec
 UPDATE m_merchant 
-SET "name" = $2, "address" = $3, "website" = $4
+SET "name" = $2, "address" = $3, "website" = $4, "updated_at" = $5
 WHERE "id" = $1
 `
 
 type UpdateMerchantParams struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Address string    `json:"address"`
-	Website string    `json:"website"`
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Address   string    `json:"address"`
+	Website   string    `json:"website"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (q *Queries) UpdateMerchant(ctx context.Context, arg UpdateMerchantParams) error {
@@ -175,6 +177,7 @@ func (q *Queries) UpdateMerchant(ctx context.Context, arg UpdateMerchantParams) 
 		arg.Name,
 		arg.Address,
 		arg.Website,
+		arg.UpdatedAt,
 	)
 	return err
 }

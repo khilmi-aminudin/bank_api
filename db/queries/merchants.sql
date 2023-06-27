@@ -10,7 +10,7 @@ INSERT INTO m_merchant (
 
 -- name: UpdateMerchant :exec
 UPDATE m_merchant 
-SET "name" = $2, "address" = $3, "website" = $4
+SET "name" = $2, "address" = $3, "website" = $4, "updated_at" = $5
 WHERE "id" = $1;
 
 -- name: GetAllMerchants :many

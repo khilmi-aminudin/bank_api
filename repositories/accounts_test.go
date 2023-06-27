@@ -20,7 +20,7 @@ func createRandomAccount(t *testing.T) MAccount {
 		Balance:    float64(utils.RandomInt(100000, 10000000)),
 	}
 
-	account, err := testStore.CreateAccount(ctx, arg)
+	account, err := testRepo.CreateAccount(ctx, arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 	require.NotEmpty(t, account.ID)
@@ -44,7 +44,7 @@ func TestAddAccountBalance(t *testing.T) {
 		ID:      account1.ID,
 	}
 
-	account2, err := testStore.AddAccountBalance(context.Background(), arg)
+	account2, err := testRepo.AddAccountBalance(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
 

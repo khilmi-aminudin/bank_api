@@ -213,7 +213,7 @@ type MCustomer struct {
 type MMerchant struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
-	Balance   string    `json:"balance"`
+	Balance   float64   `json:"balance"`
 	Address   string    `json:"address"`
 	Website   string    `json:"website"`
 	Email     string    `json:"email"`

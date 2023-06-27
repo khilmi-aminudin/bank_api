@@ -15,25 +15,5 @@ overrides:
     column: "m_account.balance"
   - go_type: float64
     column: "transaction_history.amount"
-#   - go_type: float64
-#     column: "transactions.amount"
-#   - go_type: string
-#     column: "transactions.transaction_date"
-#   - go_type: float64
-#     column: "transfers.amount"
-#   - go_type: float64
-#     column: "topups.amount"
-#   - go_type: float64
-#     column: "withdrawals.amount"
-#   - go_type: string
-#     column: "topups.description"
-#   - go_type: string
-#     column: "withdrawals.description"
-#   - go_type: string
-#     column: "merchants.description"
-#   - go_type: string
-#     column: "merchants.website"
-#   - go_type: string
-#     column: "merchants.address"
-#   - go_type: float64
-#     column: "merchants.balance"
+  - go_type: float64
+    column: "m_merchant.balance"

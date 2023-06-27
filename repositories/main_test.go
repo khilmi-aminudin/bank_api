@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"testing"
@@ -10,8 +9,8 @@ import (
 	"github.com/khilmi-aminudin/bank_api/utils"
 )
 
-var testDB *sql.DB
-var testStore Store
+// var testDB *sql.DB
+var testRepo Repository
 
 func TestMain(m *testing.M) {
 	config, err := utils.LoadConfig("../")
@@ -19,8 +18,8 @@ func TestMain(m *testing.M) {
 		log.Fatal("cannt load config : ", err)
 	}
 
-	testDB = db.Connect(*config)
-	testStore = NewStore(testDB)
+	testDB := db.Connect(*config)
+	testRepo = NewRepo(testDB)
 
 	os.Exit(m.Run())
 }

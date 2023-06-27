@@ -23,7 +23,7 @@ func createRandomCustomer(t *testing.T) MCustomer {
 		Password:     utils.RandomString(8),
 	}
 
-	customer, err := testStore.CreateCustomer(ctx, arg)
+	customer, err := testRepo.CreateCustomer(ctx, arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, customer)
 	require.NotEmpty(t, customer.ID)
@@ -50,7 +50,7 @@ func TestGetCustomerById(t *testing.T) {
 	customer1 := createRandomCustomer(t)
 	ctx := context.Background()
 
-	customer2, err := testStore.GetCustomerById(ctx, customer1.ID)
+	customer2, err := testRepo.GetCustomerById(ctx, customer1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, customer2)
@@ -65,7 +65,7 @@ func TestGetCustomerByEmail(t *testing.T) {
 	customer1 := createRandomCustomer(t)
 	ctx := context.Background()
 
-	customer2, err := testStore.GetCustomerByEmail(ctx, customer1.Email)
+	customer2, err := testRepo.GetCustomerByEmail(ctx, customer1.Email)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, customer2)
@@ -80,7 +80,7 @@ func TestGetCustomerByUsername(t *testing.T) {
 	customer1 := createRandomCustomer(t)
 	ctx := context.Background()
 
-	customer2, err := testStore.GetCustomerByUsername(ctx, customer1.Username)
+	customer2, err := testRepo.GetCustomerByUsername(ctx, customer1.Username)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, customer2)
@@ -100,7 +100,7 @@ func TestGetAllCustomers(t *testing.T) {
 
 	ctx := context.Background()
 
-	customers, err := testStore.GetAllCustomers(ctx, GetAllCustomersParams{
+	customers, err := testRepo.GetAllCustomers(ctx, GetAllCustomersParams{
 		Limit:  n / 2,
 		Offset: n / 2,
 	})

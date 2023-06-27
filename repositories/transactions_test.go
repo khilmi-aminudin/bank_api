@@ -12,7 +12,7 @@ import (
 func createRandomTransactionHistory(t *testing.T, trxType string) TransactionHistory {
 	account1 := createRandomAccount(t)
 	arg := CreateTransactionHistoryParams{
-		TransactionType: TransactionTypeTransfer,
+		TransactionType: TransactionType(trxType),
 		FromAccountID:   account1.ID,
 		Amount:          float64(utils.RandomInt(50000, 100000)),
 		Description:     utils.RandomString(100),
@@ -21,15 +21,17 @@ func createRandomTransactionHistory(t *testing.T, trxType string) TransactionHis
 	if trxType == string(TransactionTypePayment) {
 		merchant := createRandomMerchant(t)
 		arg.ToMerchantID.UUID = merchant.ID
+		arg.ToMerchantID.Valid = true
 
 	}
 
 	if trxType == string(TransactionTypeTransfer) {
 		account2 := createRandomAccount(t)
 		arg.ToAccountID.UUID = account2.ID
+		arg.ToAccountID.Valid = true
 	}
 
-	trx, err := testStore.CreateTransactionHistory(context.Background(), arg)
+	trx, err := testRepo.CreateTransactionHistory(context.Background(), arg)
 
 	require.NoError(t, err)
 
@@ -47,7 +49,7 @@ func TestCreateTransactionHistoryPayment(t *testing.T) {
 func TestGetTransactionHistory(t *testing.T) {
 	trx1 := createRandomTransactionHistory(t, string(TransactionTypeTransfer))
 
-	transactions, err := testStore.GetTransactionHistory(context.Background(), trx1.FromAccountID)
+	transactions, err := testRepo.GetTransactionHistory(context.Background(), trx1.FromAccountID)
 	require.NoError(t, err)
 	require.NotZero(t, len(transactions))
 
@@ -60,7 +62,7 @@ func TestGetTransactionHistory(t *testing.T) {
 func TestGetTransactionHistoryByType(t *testing.T) {
 	_ = createRandomTransactionHistory(t, string(TransactionTypeTransfer))
 
-	transactions, err := testStore.GetTransactionHistoryByType(context.Background(), TransactionTypeTransfer)
+	transactions, err := testRepo.GetTransactionHistoryByType(context.Background(), TransactionTypeTransfer)
 	require.NoError(t, err)
 	require.NotZero(t, len(transactions))
 
