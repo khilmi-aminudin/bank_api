@@ -6,9 +6,6 @@ postgresql :
 execdb :
 	docker exec -it postgresql psql -d bank_db
 
-uuid-db :
-	docker exec -it postgresql psql -d bank_db -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
-
 createdb :
 	docker exec -it postgresql createdb --username=root --owner=root bank_db
 

@@ -199,6 +199,7 @@ type MCustomer struct {
 	Role         Role         `json:"role"`
 	IDCardType   IDCardType   `json:"id_card_type"`
 	IDCardNumber string       `json:"id_card_number"`
+	IDCardFile   string       `json:"id_card_file"`
 	FirstName    string       `json:"first_name"`
 	LastName     string       `json:"last_name"`
 	PhoneNumber  string       `json:"phone_number"`

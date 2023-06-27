@@ -15,6 +15,7 @@ const createCustomer = `-- name: CreateCustomer :one
 INSERT INTO m_customer (
     "id_card_type",
     "id_card_number",
+    "id_card_file",
     "first_name",
     "last_name",
     "phone_number",
@@ -22,13 +23,14 @@ INSERT INTO m_customer (
     "username",
     "password"
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
-) RETURNING id, role, id_card_type, id_card_number, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
+) RETURNING id, role, id_card_type, id_card_number, id_card_file, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at
 `
 
 type CreateCustomerParams struct {
 	IDCardType   IDCardType `json:"id_card_type"`
 	IDCardNumber string     `json:"id_card_number"`
+	IDCardFile   string     `json:"id_card_file"`
 	FirstName    string     `json:"first_name"`
 	LastName     string     `json:"last_name"`
 	PhoneNumber  string     `json:"phone_number"`
@@ -41,6 +43,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 	row := q.db.QueryRowContext(ctx, createCustomer,
 		arg.IDCardType,
 		arg.IDCardNumber,
+		arg.IDCardFile,
 		arg.FirstName,
 		arg.LastName,
 		arg.PhoneNumber,
@@ -54,6 +57,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		&i.Role,
 		&i.IDCardType,
 		&i.IDCardNumber,
+		&i.IDCardFile,
 		&i.FirstName,
 		&i.LastName,
 		&i.PhoneNumber,
@@ -68,7 +72,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 }
 
 const getAllCustomers = `-- name: GetAllCustomers :many
-SELECT id, role, id_card_type, id_card_number, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at FROM m_customer
+SELECT id, role, id_card_type, id_card_number, id_card_file, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at FROM m_customer
 LIMIT $1 OFFSET $2
 `
 
@@ -91,6 +95,7 @@ func (q *Queries) GetAllCustomers(ctx context.Context, arg GetAllCustomersParams
 			&i.Role,
 			&i.IDCardType,
 			&i.IDCardNumber,
+			&i.IDCardFile,
 			&i.FirstName,
 			&i.LastName,
 			&i.PhoneNumber,
@@ -115,10 +120,11 @@ func (q *Queries) GetAllCustomers(ctx context.Context, arg GetAllCustomersParams
 }
 
 const getCustomerByEmail = `-- name: GetCustomerByEmail :one
-SELECT "role", "username", "email", "password", "status" FROM m_customer WHERE email = $1
+SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE email = $1
 `
 
 type GetCustomerByEmailRow struct {
+	ID       uuid.UUID    `json:"id"`
 	Role     Role         `json:"role"`
 	Username string       `json:"username"`
 	Email    string       `json:"email"`
@@ -130,6 +136,7 @@ func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (GetCust
 	row := q.db.QueryRowContext(ctx, getCustomerByEmail, email)
 	var i GetCustomerByEmailRow
 	err := row.Scan(
+		&i.ID,
 		&i.Role,
 		&i.Username,
 		&i.Email,
@@ -140,7 +147,7 @@ func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (GetCust
 }
 
 const getCustomerById = `-- name: GetCustomerById :one
-SELECT id, role, id_card_type, id_card_number, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at FROM m_customer WHERE id = $1
+SELECT id, role, id_card_type, id_card_number, id_card_file, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at FROM m_customer WHERE "id" = $1
 `
 
 func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (MCustomer, error) {
@@ -151,6 +158,7 @@ func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (MCustomer,
 		&i.Role,
 		&i.IDCardType,
 		&i.IDCardNumber,
+		&i.IDCardFile,
 		&i.FirstName,
 		&i.LastName,
 		&i.PhoneNumber,
@@ -165,10 +173,11 @@ func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (MCustomer,
 }
 
 const getCustomerByUsername = `-- name: GetCustomerByUsername :one
-SELECT "role", "username", "email", "password", "status" FROM m_customer WHERE username = $1
+SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE username = $1
 `
 
 type GetCustomerByUsernameRow struct {
+	ID       uuid.UUID    `json:"id"`
 	Role     Role         `json:"role"`
 	Username string       `json:"username"`
 	Email    string       `json:"email"`
@@ -180,11 +189,54 @@ func (q *Queries) GetCustomerByUsername(ctx context.Context, username string) (G
 	row := q.db.QueryRowContext(ctx, getCustomerByUsername, username)
 	var i GetCustomerByUsernameRow
 	err := row.Scan(
+		&i.ID,
 		&i.Role,
 		&i.Username,
 		&i.Email,
 		&i.Password,
 		&i.Status,
+	)
+	return i, err
+}
+
+const updateCustomer = `-- name: UpdateCustomer :one
+UPDATE m_customer
+SET "id_card_type" = $2, "id_card_number" = $3, "id_card_file" = $4, "status" = $5
+WHERE "id" = $1 RETURNING id, role, id_card_type, id_card_number, id_card_file, first_name, last_name, phone_number, email, username, password, status, created_at, updated_at
+`
+
+type UpdateCustomerParams struct {
+	ID           uuid.UUID    `json:"id"`
+	IDCardType   IDCardType   `json:"id_card_type"`
+	IDCardNumber string       `json:"id_card_number"`
+	IDCardFile   string       `json:"id_card_file"`
+	Status       CustomerEnum `json:"status"`
+}
+
+func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (MCustomer, error) {
+	row := q.db.QueryRowContext(ctx, updateCustomer,
+		arg.ID,
+		arg.IDCardType,
+		arg.IDCardNumber,
+		arg.IDCardFile,
+		arg.Status,
+	)
+	var i MCustomer
+	err := row.Scan(
+		&i.ID,
+		&i.Role,
+		&i.IDCardType,
+		&i.IDCardNumber,
+		&i.IDCardFile,
+		&i.FirstName,
+		&i.LastName,
+		&i.PhoneNumber,
+		&i.Email,
+		&i.Username,
+		&i.Password,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

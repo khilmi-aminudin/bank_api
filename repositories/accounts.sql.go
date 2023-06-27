@@ -64,3 +64,21 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (M
 	)
 	return i, err
 }
+
+const getAccountByNumber = `-- name: GetAccountByNumber :one
+SELECT id, customer_id, number, balance, created_at FROM m_account 
+WHERE "number" = $1
+`
+
+func (q *Queries) GetAccountByNumber(ctx context.Context, number string) (MAccount, error) {
+	row := q.db.QueryRowContext(ctx, getAccountByNumber, number)
+	var i MAccount
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.Number,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
+}

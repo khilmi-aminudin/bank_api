@@ -12,3 +12,7 @@ UPDATE m_account
 SET balance = balance + sqlc.arg(balance)
 WHERE id = sqlc.arg(id)
 RETURNING *;
+
+-- name: GetAccountByNumber :one
+SELECT * FROM m_account 
+WHERE "number" = $1;
