@@ -49,7 +49,7 @@ func (server *Server) setupRouter() {
 	accountHandler := handlers.NewAccountHandler(accountService, customerService)
 	customerHandler := handlers.NewCustomerHandler(customerService, server.config)
 	merchantHandler := handlers.NewMerchantHandler(merchantService)
-	transactionHandler := handlers.NewTransactionHandler(transactionService, accountService, customerService)
+	transactionHandler := handlers.NewTransactionHandler(transactionService, accountService, customerService, merchantService)
 
 	authHandler := handlers.NewAUthHandler(server.config, tMaker, customerService)
 
@@ -83,7 +83,7 @@ func (server *Server) setupRouter() {
 	{
 		merchant.POST("", merchantHandler.CreateMerchant)
 		merchant.PATCH("", merchantHandler.UpdateMerchant)
-		merchant.GET("/:name", merchantHandler.GetMerchantByName)
+		merchant.GET("/:merchant_name", merchantHandler.GetMerchantByName)
 		merchant.GET("", merchantHandler.GetAllMerchants)
 	}
 
@@ -93,8 +93,8 @@ func (server *Server) setupRouter() {
 		trx.POST("/pay", transactionHandler.PaymentTx)
 		trx.POST("/topup", transactionHandler.TopupTx)
 		trx.POST("/withdraw", transactionHandler.WithdrawalTx)
-		trx.GET("/history/type", transactionHandler.GetTransactionHistoryByType)
-		trx.GET("/history/:id", transactionHandler.GetTransactionHistory)
+		trx.GET("/history-type/:type", transactionHandler.GetTransactionHistoryByType)
+		trx.GET("/history", transactionHandler.GetTransactionHistory)
 
 	}
 

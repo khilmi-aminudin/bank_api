@@ -18,7 +18,7 @@ SELECT * FROM m_merchant;
 
 -- name: GetMerchantByName :one
 SELECT * FROM m_merchant
-WHERE "name" = $1;
+WHERE LOWER("name") = LOWER($1);
 
 -- name: GetMerchantById :one
 SELECT * FROM m_merchant

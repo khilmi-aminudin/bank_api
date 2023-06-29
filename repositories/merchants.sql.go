@@ -138,11 +138,11 @@ func (q *Queries) GetMerchantById(ctx context.Context, id uuid.UUID) (MMerchant,
 
 const getMerchantByName = `-- name: GetMerchantByName :one
 SELECT id, name, balance, address, website, email, created_at, updated_at FROM m_merchant
-WHERE "name" = $1
+WHERE LOWER("name") = LOWER($1)
 `
 
-func (q *Queries) GetMerchantByName(ctx context.Context, name string) (MMerchant, error) {
-	row := q.db.QueryRowContext(ctx, getMerchantByName, name)
+func (q *Queries) GetMerchantByName(ctx context.Context, lower string) (MMerchant, error) {
+	row := q.db.QueryRowContext(ctx, getMerchantByName, lower)
 	var i MMerchant
 	err := row.Scan(
 		&i.ID,

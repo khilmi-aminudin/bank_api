@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
@@ -63,8 +65,14 @@ func (h *merchantHandler) CreateMerchant(c *gin.Context) {
 		return
 	}
 
-	data := gin.H{
-		"merchant_name": merchant.Name,
+	data := struct {
+		Name    string `json:"name"`
+		Address string `json:"address"`
+		Website string `json:"website"`
+	}{
+		Name:    merchant.Name,
+		Address: merchant.Address,
+		Website: merchant.Website,
 	}
 
 	c.JSON(responseCreated("success created", data))
@@ -72,23 +80,59 @@ func (h *merchantHandler) CreateMerchant(c *gin.Context) {
 
 // GetAllMerchants implements MerchantHandler.
 func (h *merchantHandler) GetAllMerchants(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
 	data, err := h.service.GetAllMerchants(c)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	c.JSON(responseOK("success", data))
+	if payload.Role == string(m.RoleAdmin) {
+		c.JSON(responseOK("success", data))
+		return
+	}
+
+	type newMerchant struct {
+		Name    string `json:"name"`
+		Address string `json:"address"`
+		Website string `json:"website"`
+	}
+
+	var newData []newMerchant
+
+	for _, d := range data {
+		nm := newMerchant{
+			Name:    d.Name,
+			Address: d.Address,
+			Website: d.Website,
+		}
+
+		newData = append(newData, nm)
+	}
+
+	c.JSON(responseOK("success", newData))
+
 }
 
 type getMerchantByNameRequest struct {
-	MerchantName string `form:"merchant" binding:"required,min=1"`
+	MerchantName string `uri:"merchant_name" binding:"required"`
 }
 
 // GetMerchantByName implements MerchantHandler.
 func (h *merchantHandler) GetMerchantByName(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
 	var req getMerchantByNameRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
+	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -99,36 +143,58 @@ func (h *merchantHandler) GetMerchantByName(c *gin.Context) {
 		return
 	}
 
+	if payload.Role == string(m.RoleAdmin) {
+		fmt.Println("CALLED")
+		c.JSON(responseOK("success", merchant))
+		return
+	}
 	data := struct {
-		ID      uuid.UUID `json:"id"`
-		Name    string    `json:"name"`
-		Address string    `json:"address"`
-		Website string    `json:"website"`
+		Name    string `json:"name"`
+		Address string `json:"address"`
+		Website string `json:"website"`
 	}{
-		ID:      merchant.ID,
 		Name:    merchant.Name,
 		Address: merchant.Address,
 		Website: merchant.Website,
 	}
 	c.JSON(responseOK("success", data))
+
 }
 
 type updateMerchantRequest struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Address string    `json:"address"`
-	Website string    `json:"website"`
+	ID      uuid.UUID `json:"-"`
+	Name    string    `json:"name" binding:"required,min=3"`
+	Address string    `json:"address" binding:"required,min=3"`
+	Website string    `json:"website" binding:"required,min=3"`
 }
 
 // UpdateMerchant implements MerchantHandler.
 func (h *merchantHandler) UpdateMerchant(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	if payload.Role != string(m.RoleAdmin) {
+		c.JSON(responseUnauthorized("Unauthorized"))
+		return
+	}
+
 	var req updateMerchantRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
+
+	merchant, err := h.service.GetMerchantByName(c, req.Name)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
 	args := m.UpdateMerchantParams{
-		ID:      req.ID,
+		ID:      merchant.ID,
 		Name:    req.Name,
 		Address: req.Address,
 		Website: req.Website,

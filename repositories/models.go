@@ -186,6 +186,14 @@ func (ns NullTransactionType) Value() (driver.Value, error) {
 	return string(ns.TransactionType), nil
 }
 
+type Entry struct {
+	ID              uuid.UUID       `json:"id"`
+	AccountID       uuid.UUID       `json:"account_id"`
+	TransactionType TransactionType `json:"transaction_type"`
+	TransactionID   uuid.UUID       `json:"transaction_id"`
+	Amount          string          `json:"amount"`
+}
+
 type MAccount struct {
 	ID         uuid.UUID `json:"id"`
 	CustomerID uuid.UUID `json:"customer_id"`

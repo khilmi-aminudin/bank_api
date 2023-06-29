@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -70,8 +71,15 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	cstData, err := h.customerSvc.GetCustomerByUsername(c, req.Username)
 	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+		c.JSON(responseNotFound(fmt.Sprintf("user %s not found", req.Username)))
+		return
 	}
+
+	if cstData.Status != m.CustomerEnumActive && cstData.Status != m.CustomerEnumPending {
+		c.JSON(responseForbidden(fmt.Sprintf("user %s is %s", req.Username, string(cstData.Status))))
+		return
+	}
+
 	err = utils.CheckPassword(req.Password, cstData.Password)
 	if err != nil {
 		c.JSON(responseUnauthorized(err.Error()))
@@ -84,6 +92,7 @@ func (h *authHandler) Login(c *gin.Context) {
 	)
 	if err != nil {
 		c.JSON(responseInternalServerError(err.Error()))
+		return
 	}
 	refreshToken, refreshPayload, err := h.tokenMaker.CreateToken(
 		req.Username,
@@ -92,6 +101,7 @@ func (h *authHandler) Login(c *gin.Context) {
 	)
 	if err != nil {
 		c.JSON(responseInternalServerError(err.Error()))
+		return
 	}
 	rsp := loginUserResponse{
 		AccessToken:           accessToken,

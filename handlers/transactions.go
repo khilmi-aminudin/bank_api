@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
 	"github.com/khilmi-aminudin/bank_api/middleware"
 	m "github.com/khilmi-aminudin/bank_api/repositories"
@@ -24,34 +23,44 @@ type transactionHandler struct {
 	trxservice      services.TransactionsService
 	accountService  services.AccoountService
 	customerService services.CustomerService
+	merchantService services.MerchantService
 }
 
-func NewTransactionHandler(trxservice services.TransactionsService, accountService services.AccoountService, customerService services.CustomerService) TransactionHandler {
+func NewTransactionHandler(
+	trxservice services.TransactionsService,
+	accountService services.AccoountService,
+	customerService services.CustomerService,
+	merchantService services.MerchantService,
+) TransactionHandler {
 	return &transactionHandler{
 		trxservice:      trxservice,
 		accountService:  accountService,
 		customerService: customerService,
+		merchantService: merchantService,
 	}
-}
-
-type accountId struct {
-	AccountId string `uri:"id" binding:"required"`
 }
 
 // GetTransactionHistory implements TransactionHandler.
 func (h *transactionHandler) GetTransactionHistory(c *gin.Context) {
-	var req accountId
-	if err := c.ShouldBindJSON(&req); err != nil {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
-	var idParsed uuid.UUID
-	var err error
-	if idParsed, err = uuid.Parse(req.AccountId); err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
 		return
 	}
-	data, err := h.trxservice.GetTransactionHistory(c, idParsed)
+
+	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	data, err := h.trxservice.GetTransactionHistory(c, fromAccount.ID)
 
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
@@ -62,27 +71,39 @@ func (h *transactionHandler) GetTransactionHistory(c *gin.Context) {
 }
 
 type getTransactionHistoryByTypeRequest struct {
-	TransactionType string `form:"transaction_type"`
-	AccountId       string `form:"account_id"`
+	TransactionType string `uri:"type"`
 }
 
 // GetTransactionHistoryByType implements TransactionHandler.
 func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
-	var req getTransactionHistoryByTypeRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
+	fmt.Println("CALLED")
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	fromAccountID, err := uuid.Parse(req.AccountId)
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	var req getTransactionHistoryByTypeRequest
+	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	args := m.GetTransactionHistoryByTypeParams{
 		TransactionType: m.TransactionType(req.TransactionType),
-		FromAccountID:   fromAccountID,
+		FromAccountID:   fromAccount.ID,
 	}
 
 	data, err := h.trxservice.GetTransactionHistoryByType(c, args)
@@ -95,34 +116,53 @@ func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
 }
 
 type createPaymentRequest struct {
-	FromAccountID string  `json:"from_account_id"`
-	ToMerchantID  string  `json:"to_merchant_id"`
-	Amount        float64 `json:"amount"`
+	FromAccountID string  `json:"-"`
+	ToMerchant    string  `json:"to_merchant" binding:"required"`
+	Amount        float64 `json:"amount" binding:"required,min=1"`
 	Description   string  `json:"description"`
 }
 
 // PaymentTx implements TransactionHandler.
 func (h *transactionHandler) PaymentTx(c *gin.Context) {
-	var req createPaymentRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(responseBadRequest(err.Error()))
-		return
-	}
-	accountId, err := uuid.Parse(req.FromAccountID)
+	payload, err := middleware.GetPayload(c)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	merchantId, err := uuid.Parse(req.ToMerchantID)
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	var req createPaymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+
 		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	if req.Amount > fromAccount.Balance {
+		c.JSON(responseBadRequest("balance not enough"))
+		return
+	}
+
+	merchant, err := h.merchantService.GetMerchantByName(c, req.ToMerchant)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	args := m.PaymentTxParams{
-		FromAccountID: accountId,
-		ToMerchantID:  merchantId,
+		FromAccountID: fromAccount.ID,
+		ToMerchantID:  merchant.ID,
 		Amount:        req.Amount,
 		Description:   req.Description,
 	}
@@ -132,7 +172,7 @@ func (h *transactionHandler) PaymentTx(c *gin.Context) {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
-	c.JSON(responseOK("success", data))
+	c.JSON(responseOK("success", "payment success, transaction id : ", data.TransactionID))
 }
 
 type createTopupRequest struct {
@@ -172,7 +212,7 @@ func (h *transactionHandler) TopupTx(c *gin.Context) {
 		return
 	}
 
-	c.JSON(responseOK("success", data))
+	c.JSON(responseOK("success", fmt.Sprint("topup success, with transaction id: ", data.TransactionID)))
 }
 
 type createTransferRequest struct {
@@ -240,22 +280,33 @@ func (h *transactionHandler) TransferTx(c *gin.Context) {
 }
 
 type createWithdrawalRequest struct {
-	AccountNumber int64   `json:"account_number"`
-	Amount        float64 `json:"amount"`
-	Description   string  `json:"description"`
+	Amount      float64 `json:"amount"`
+	Description string  `json:"description"`
 }
 
 // WithdrawalTx implements TransactionHandler.
 func (h *transactionHandler) WithdrawalTx(c *gin.Context) {
-	var req createWithdrawalRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	account, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.AccountNumber))
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
 		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	account, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	var req createWithdrawalRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
@@ -281,5 +332,5 @@ func (h *transactionHandler) WithdrawalTx(c *gin.Context) {
 		return
 	}
 
-	c.JSON(responseOK("success", data))
+	c.JSON(responseOK("success", fmt.Sprintf("transfer successfully transferred, transaction number : %v", data.TransactionID)))
 }

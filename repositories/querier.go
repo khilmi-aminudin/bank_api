@@ -25,7 +25,7 @@ type Querier interface {
 	GetCustomerById(ctx context.Context, id uuid.UUID) (MCustomer, error)
 	GetCustomerByUsername(ctx context.Context, username string) (GetCustomerByUsernameRow, error)
 	GetMerchantById(ctx context.Context, id uuid.UUID) (MMerchant, error)
-	GetMerchantByName(ctx context.Context, name string) (MMerchant, error)
+	GetMerchantByName(ctx context.Context, lower string) (MMerchant, error)
 	GetTransactionHistory(ctx context.Context, fromAccountID uuid.UUID) ([]TransactionHistory, error)
 	GetTransactionHistoryByType(ctx context.Context, arg GetTransactionHistoryByTypeParams) ([]TransactionHistory, error)
 	UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (MCustomer, error)
