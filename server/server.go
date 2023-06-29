@@ -43,9 +43,14 @@ func (server *Server) setupRouter() {
 
 	accountService := services.NewAccountService(repository)
 	customerService := services.NewCustomerService(repository)
+	merchantService := services.NewMerchantService(repository)
+	transactionService := services.NewTransactionsService(repository)
 
 	accountHandler := handlers.NewAccountHandler(accountService, customerService)
 	customerHandler := handlers.NewCustomerHandler(customerService, server.config)
+	merchantHandler := handlers.NewMerchantHandler(merchantService)
+	transactionHandler := handlers.NewTransactionHandler(transactionService, accountService, customerService)
+
 	authHandler := handlers.NewAUthHandler(server.config, tMaker, customerService)
 
 	// init router
@@ -59,21 +64,41 @@ func (server *Server) setupRouter() {
 	router.POST("/api/v1/register", customerHandler.CreateCustomer)
 	router.POST("/api/v1/login", authHandler.Login)
 
-	account := router.Group("/api/v1/accounts")
+	authMiddleware := middleware.AuthMiddleware(server.tokenMaker)
+
+	account := router.Group("/api/v1/accounts", authMiddleware)
 	{
-		account.POST("/", accountHandler.CreateAccount)
-		account.GET("/", accountHandler.GetAccountByNumber)
+		account.POST("", accountHandler.CreateAccount)
+		account.GET("/:account_number", accountHandler.GetAccountByNumber)
 	}
 
-	customer := router.Group("/api/v1/customers", middleware.AuthMiddleware(server.tokenMaker))
+	customer := router.Group("/api/v1/customers", authMiddleware)
 	{
-		customer.PATCH("/", customerHandler.UpdateCustomer)
-		customer.GET("/", customerHandler.GetAllCustomers)
+		customer.PATCH("", customerHandler.UpdateCustomer)
+		customer.GET("", customerHandler.GetAllCustomers)
 		customer.GET("/:id", customerHandler.GetCustomerById)
 	}
 
-	server.router = router
+	merchant := router.Group("/api/v1/merchants", authMiddleware)
+	{
+		merchant.POST("", merchantHandler.CreateMerchant)
+		merchant.PATCH("", merchantHandler.UpdateMerchant)
+		merchant.GET("/:name", merchantHandler.GetMerchantByName)
+		merchant.GET("", merchantHandler.GetAllMerchants)
+	}
 
+	trx := router.Group("/api/v1/transactions", authMiddleware)
+	{
+		trx.POST("/transfer", transactionHandler.TransferTx)
+		trx.POST("/pay", transactionHandler.PaymentTx)
+		trx.POST("/topup", transactionHandler.TopupTx)
+		trx.POST("/withdraw", transactionHandler.WithdrawalTx)
+		trx.GET("/history/type", transactionHandler.GetTransactionHistoryByType)
+		trx.GET("/history/:id", transactionHandler.GetTransactionHistory)
+
+	}
+
+	server.router = router
 }
 
 func (server *Server) Start(addres string) error {

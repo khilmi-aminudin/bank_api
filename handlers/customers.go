@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
 
+	"github.com/khilmi-aminudin/bank_api/middleware"
+	"github.com/khilmi-aminudin/bank_api/models"
 	m "github.com/khilmi-aminudin/bank_api/repositories"
 	"github.com/khilmi-aminudin/bank_api/services"
 	"github.com/khilmi-aminudin/bank_api/utils"
@@ -85,6 +87,18 @@ type listCustomerRequest struct {
 
 // GetAllCustomers implements CustomerHandler.
 func (h *customerHandler) GetAllCustomers(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	cstData, err := h.service.GetCustomerByUsername(c, payload.Username)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
 	var req listCustomerRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
@@ -101,29 +115,55 @@ func (h *customerHandler) GetAllCustomers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(responseOK("success", data))
+	if payload.Role == string(m.RoleAdmin) {
+		c.JSON(responseOK("success", data))
+		return
+	}
+
+	var newData m.MCustomer
+
+loop:
+	for _, d := range data {
+		if d.ID == cstData.ID {
+			newData = d
+			break loop
+		}
+	}
+
+	c.JSON(responseOK("success", models.NewCustomers(newData)))
 }
 
 type getCustomer struct {
-	ID string `json:"id" binding:"required"`
+	ID string `uri:"id" binding:"required"`
 }
 
 // GetCustomerById implements CustomerHandler.
 func (h *customerHandler) GetCustomerById(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	if payload.Role != string(m.RoleAdmin) {
+		c.JSON(responseUnauthorized("Unauthorized"))
+		return
+	}
+
 	var req getCustomer
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 	parsedID, err := uuid.Parse(req.ID)
 	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+		c.JSON(responseBadRequest("invalid customer id"))
 		return
 	}
 
 	data, err := h.service.GetCustomerById(c, parsedID)
 	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
@@ -131,7 +171,7 @@ func (h *customerHandler) GetCustomerById(c *gin.Context) {
 }
 
 type updateCustomerrequest struct {
-	ID           string                `form:"id" binding:"required"`
+	ID           string
 	IDCardType   string                `form:"id_card_type" binding:"required"`
 	IDCardNumber string                `form:"id_card_number" binding:"required"`
 	File         *multipart.FileHeader `form:"file" binding:"required"`
@@ -139,15 +179,21 @@ type updateCustomerrequest struct {
 
 // UpdateCustomer implements CustomerHandler.
 func (h *customerHandler) UpdateCustomer(c *gin.Context) {
-	var req updateCustomerrequest
-	if err := c.ShouldBindWith(req, binding.FormMultipart); err != nil {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	idCustomer, err := uuid.Parse(req.ID)
+	cstData, err := h.service.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
-		c.JSON(responseBadRequest("invalid id format"))
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	var req updateCustomerrequest
+	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
+		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
@@ -156,8 +202,9 @@ func (h *customerHandler) UpdateCustomer(c *gin.Context) {
 		c.JSON(responseInternalServerError("error uploading id card"))
 		return
 	}
+
 	arg := m.UpdateCustomerParams{
-		ID:           idCustomer,
+		ID:           cstData.ID,
 		IDCardType:   m.IDCardType(req.IDCardType),
 		IDCardNumber: req.IDCardNumber,
 		IDCardFile:   uploadedFilename,

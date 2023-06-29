@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -46,6 +48,11 @@ func (h *accountHandler) CreateAccount(c *gin.Context) {
 		return
 	}
 
+	if cstData.Status != m.CustomerEnumActive {
+		c.JSON(responseForbidden("your user account is not active"))
+		return
+	}
+
 	var req createAccountRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -68,7 +75,7 @@ func (h *accountHandler) CreateAccount(c *gin.Context) {
 }
 
 type getAccountRequest struct {
-	AccountNumber string `json:"account_number" binding:"required,min=50000"`
+	AccountNumber string `uri:"account_number" binding:"required"`
 }
 
 // GetAccountByNumber implements AccountHandler.
@@ -86,7 +93,7 @@ func (h *accountHandler) GetAccountByNumber(c *gin.Context) {
 	}
 
 	var req getAccountRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -98,9 +105,15 @@ func (h *accountHandler) GetAccountByNumber(c *gin.Context) {
 	}
 
 	if data.CustomerID != cstData.ID {
+		cst, err := h.customerservice.GetCustomerById(c, data.CustomerID)
+		if err != nil {
+			c.JSON(responseBadRequest(err.Error()))
+			return
+		}
+
 		c.JSON(responseOK("success", gin.H{
 			"account_number": req.AccountNumber,
-			"account_owner":  cstData.Username,
+			"account_owner":  strings.ToUpper(fmt.Sprintf("%s %s", cst.FirstName, cst.LastName)),
 		}))
 		return
 	}

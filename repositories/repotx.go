@@ -195,12 +195,9 @@ func (repo *repository) TopupTx(ctx context.Context, args TopupParams) (TopupRes
 
 		trx, err := q.CreateTransactionHistory(ctx, CreateTransactionHistoryParams{
 			TransactionType: TransactionTypeTopup,
-			ToAccountID: uuid.NullUUID{
-				UUID:  args.ToAccountId,
-				Valid: true,
-			},
-			Amount:      args.Amount,
-			Description: args.Description,
+			FromAccountID:   args.ToAccountId,
+			Amount:          args.Amount,
+			Description:     args.Description,
 		})
 
 		if err != nil {
@@ -231,7 +228,7 @@ func (repo *repository) WithdrawalTx(ctx context.Context, args WithdrawalParams)
 		var err error
 
 		result.Account, err = q.AddAccountBalance(ctx, AddAccountBalanceParams{
-			Balance: args.Amount,
+			Balance: -args.Amount,
 			ID:      args.FromAccountID,
 		})
 
@@ -242,7 +239,7 @@ func (repo *repository) WithdrawalTx(ctx context.Context, args WithdrawalParams)
 		trx, err := q.CreateTransactionHistory(ctx, CreateTransactionHistoryParams{
 			TransactionType: TransactionTypeWithdrawal,
 			FromAccountID:   args.FromAccountID,
-			Amount:          args.Amount,
+			Amount:          -args.Amount,
 			Description:     args.Description,
 		})
 

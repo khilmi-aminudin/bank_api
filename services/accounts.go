@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"github.com/khilmi-aminudin/bank_api/repositories"
 	"github.com/khilmi-aminudin/bank_api/utils"
 )
@@ -11,6 +13,7 @@ type AccoountService interface {
 	CreateAccount(ctx context.Context, args repositories.CreateAccountParams) (repositories.MAccount, error)
 	GetAccountByNumber(ctx context.Context, accountnumber string) (repositories.MAccount, error)
 	AddAccountBalance(ctx context.Context, args AddAccountBalanceParams) (repositories.MAccount, error)
+	GetAccountByCustomerId(ctx context.Context, customerId uuid.UUID) (repositories.MAccount, error)
 }
 
 type accountService struct {
@@ -43,6 +46,11 @@ func (s *accountService) AddAccountBalance(ctx context.Context, args AddAccountB
 // GetAccountByNumber implements AccoountService.
 func (s *accountService) GetAccountByNumber(ctx context.Context, accountnumber string) (repositories.MAccount, error) {
 	return s.repository.GetAccountByNumber(ctx, accountnumber)
+}
+
+// GetAccountByCustomerId implements AccoountService.
+func (s *accountService) GetAccountByCustomerId(ctx context.Context, customerId uuid.UUID) (repositories.MAccount, error) {
+	return s.repository.GetAccountByCustomerID(ctx, customerId)
 }
 
 // CreateAccount implements AccoountService.

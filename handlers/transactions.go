@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/khilmi-aminudin/bank_api/middleware"
 	m "github.com/khilmi-aminudin/bank_api/repositories"
 	"github.com/khilmi-aminudin/bank_api/services"
 )
@@ -18,17 +21,21 @@ type TransactionHandler interface {
 }
 
 type transactionHandler struct {
-	service services.TransactionsService
+	trxservice      services.TransactionsService
+	accountService  services.AccoountService
+	customerService services.CustomerService
 }
 
-func NewTransactionHandler(service services.TransactionsService) TransactionHandler {
+func NewTransactionHandler(trxservice services.TransactionsService, accountService services.AccoountService, customerService services.CustomerService) TransactionHandler {
 	return &transactionHandler{
-		service: service,
+		trxservice:      trxservice,
+		accountService:  accountService,
+		customerService: customerService,
 	}
 }
 
 type accountId struct {
-	AccountId string `json:"account_id"`
+	AccountId string `uri:"id" binding:"required"`
 }
 
 // GetTransactionHistory implements TransactionHandler.
@@ -44,7 +51,7 @@ func (h *transactionHandler) GetTransactionHistory(c *gin.Context) {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
-	data, err := h.service.GetTransactionHistory(c, idParsed)
+	data, err := h.trxservice.GetTransactionHistory(c, idParsed)
 
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
@@ -55,14 +62,14 @@ func (h *transactionHandler) GetTransactionHistory(c *gin.Context) {
 }
 
 type getTransactionHistoryByTypeRequest struct {
-	TransactionType string `json:"transaction_type"`
-	AccountId       string `json:"account_id"`
+	TransactionType string `form:"transaction_type"`
+	AccountId       string `form:"account_id"`
 }
 
 // GetTransactionHistoryByType implements TransactionHandler.
 func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
 	var req getTransactionHistoryByTypeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -78,7 +85,7 @@ func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
 		FromAccountID:   fromAccountID,
 	}
 
-	data, err := h.service.GetTransactionHistoryByType(c, args)
+	data, err := h.trxservice.GetTransactionHistoryByType(c, args)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
@@ -120,7 +127,7 @@ func (h *transactionHandler) PaymentTx(c *gin.Context) {
 		Description:   req.Description,
 	}
 
-	data, err := h.service.PaymentTx(c, args)
+	data, err := h.trxservice.PaymentTx(c, args)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
@@ -129,9 +136,9 @@ func (h *transactionHandler) PaymentTx(c *gin.Context) {
 }
 
 type createTopupRequest struct {
-	ToAccountId string  `json:"to_account_id"`
-	Amount      float64 `json:"amount"`
-	Description string  `json:"description"`
+	AccountNumber int64   `json:"account_number"`
+	Amount        float64 `json:"amount"`
+	Description   string  `json:"description"`
 }
 
 // TopupTx implements TransactionHandler.
@@ -142,19 +149,24 @@ func (h *transactionHandler) TopupTx(c *gin.Context) {
 		return
 	}
 
-	accountId, err := uuid.Parse(req.ToAccountId)
+	if req.Amount <= 0 {
+		c.JSON(responseBadRequest("amount must be greater than zero"))
+		return
+	}
+
+	account, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.AccountNumber))
 	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	args := m.TopupParams{
-		ToAccountId: accountId,
+		ToAccountId: account.ID,
 		Amount:      req.Amount,
 		Description: req.Description,
 	}
 
-	data, err := h.service.TopupTx(c, args)
+	data, err := h.trxservice.TopupTx(c, args)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
@@ -164,49 +176,71 @@ func (h *transactionHandler) TopupTx(c *gin.Context) {
 }
 
 type createTransferRequest struct {
-	FromAccountID string  `json:"from_account_id"`
-	ToAccountID   string  `json:"to_account_id"`
-	Amount        float64 `json:"amount"`
-	Description   string  `json:"description"`
+	ToAccountNumber int64   `json:"to_account_number"`
+	Amount          float64 `json:"amount"`
+	Description     string  `json:"description"`
 }
 
 // TransferTx implements TransactionHandler.
 func (h *transactionHandler) TransferTx(c *gin.Context) {
+	payload, err := middleware.GetPayload(c)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
+	if err != nil {
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
+	if err != nil {
+		c.JSON(responseBadRequest(err.Error()))
+		return
+	}
+
 	var req createTransferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	fromAccountId, err := uuid.Parse(req.FromAccountID)
+	if req.Amount > fromAccount.Balance {
+		c.JSON(responseBadRequest("balance not enough"))
+		return
+	}
+
+	if req.Amount <= 0 {
+		c.JSON(responseBadRequest("invalid amount"))
+		return
+	}
+
+	toAccount, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.ToAccountNumber))
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	toAccountId, err := uuid.Parse(req.ToAccountID)
-	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
-		return
-	}
 	args := m.TranferTxParams{
-		FromAccountID: fromAccountId,
-		ToAccountID:   toAccountId,
+		FromAccountID: fromAccount.ID,
+		ToAccountID:   toAccount.ID,
 		Amount:        req.Amount,
 		Description:   req.Description,
 	}
 
-	data, err := h.service.TransferTx(c, args)
+	data, err := h.trxservice.TransferTx(c, args)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	c.JSON(responseOK("success", data))
+	c.JSON(responseOK("success", fmt.Sprintf("transfer successfully transferred, transaction number : %v", data.TransactionID)))
 }
 
 type createWithdrawalRequest struct {
-	FromAccountID string  `json:"from_account_id"`
+	AccountNumber int64   `json:"account_number"`
 	Amount        float64 `json:"amount"`
 	Description   string  `json:"description"`
 }
@@ -218,19 +252,30 @@ func (h *transactionHandler) WithdrawalTx(c *gin.Context) {
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
-	fromAccountId, err := uuid.Parse(req.FromAccountID)
+
+	account, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.AccountNumber))
 	if err != nil {
-		c.JSON(responseBadRequest(err.Error()))
+		c.JSON(responseNotFound(err.Error()))
+		return
+	}
+
+	if req.Amount > account.Balance {
+		c.JSON(responseBadRequest("balance not enough"))
+		return
+	}
+
+	if req.Amount <= 0 {
+		c.JSON(responseBadRequest("invalid amount"))
 		return
 	}
 
 	args := m.WithdrawalParams{
-		FromAccountID: fromAccountId,
+		FromAccountID: account.ID,
 		Amount:        req.Amount,
 		Description:   req.Description,
 	}
 
-	data, err := h.service.WithdrawalTx(c, args)
+	data, err := h.trxservice.WithdrawalTx(c, args)
 	if err != nil {
 		c.JSON(responseBadRequest(err.Error()))
 		return
