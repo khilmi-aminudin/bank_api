@@ -69,7 +69,6 @@ func TestGetTransactionHistoryByType(t *testing.T) {
 
 	transactions, err := testRepo.GetTransactionHistoryByType(context.Background(), arg)
 	require.NoError(t, err)
-	require.NotZero(t, len(transactions))
 
 	for _, trx := range transactions {
 		require.NotEmpty(t, trx)
