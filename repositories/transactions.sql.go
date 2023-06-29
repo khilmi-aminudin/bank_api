@@ -95,11 +95,16 @@ func (q *Queries) GetTransactionHistory(ctx context.Context, fromAccountID uuid.
 
 const getTransactionHistoryByType = `-- name: GetTransactionHistoryByType :many
 SELECT id, transaction_type, from_account_id, to_account_id, to_merchant_id, amount, description, created_at FROM transaction_history 
-WHERE transaction_type = $1
+WHERE transaction_type = $1 AND from_account_id = $2
 `
 
-func (q *Queries) GetTransactionHistoryByType(ctx context.Context, transactionType TransactionType) ([]TransactionHistory, error) {
-	rows, err := q.db.QueryContext(ctx, getTransactionHistoryByType, transactionType)
+type GetTransactionHistoryByTypeParams struct {
+	TransactionType TransactionType `json:"transaction_type"`
+	FromAccountID   uuid.UUID       `json:"from_account_id"`
+}
+
+func (q *Queries) GetTransactionHistoryByType(ctx context.Context, arg GetTransactionHistoryByTypeParams) ([]TransactionHistory, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionHistoryByType, arg.TransactionType, arg.FromAccountID)
 	if err != nil {
 		return nil, err
 	}

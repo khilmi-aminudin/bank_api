@@ -21,10 +21,10 @@ LIMIT $1 OFFSET $2;
 SELECT * FROM m_customer WHERE "id" = $1;
 
 -- name: GetCustomerByEmail :one
-SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE email = $1;
+SELECT "id", "role", "username", "email", "password", "status", "created_at" FROM m_customer WHERE email = $1;
 
 -- name: GetCustomerByUsername :one
-SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE username = $1;
+SELECT "id", "role", "username", "email", "password", "status", "created_at" FROM m_customer WHERE username = $1;
 
 -- name: UpdateCustomer :one
 UPDATE m_customer

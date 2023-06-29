@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/khilmi-aminudin/bank_api/repositories"
+	"github.com/khilmi-aminudin/bank_api/utils"
 )
 
 type AccoountService interface {
@@ -46,5 +47,6 @@ func (s *accountService) GetAccountByNumber(ctx context.Context, accountnumber s
 
 // CreateAccount implements AccoountService.
 func (s *accountService) CreateAccount(ctx context.Context, args repositories.CreateAccountParams) (repositories.MAccount, error) {
+	args.Number = utils.RandomNumber(10)
 	return s.repository.CreateAccount(ctx, args)
 }

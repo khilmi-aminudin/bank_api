@@ -7,6 +7,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -120,16 +121,17 @@ func (q *Queries) GetAllCustomers(ctx context.Context, arg GetAllCustomersParams
 }
 
 const getCustomerByEmail = `-- name: GetCustomerByEmail :one
-SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE email = $1
+SELECT "id", "role", "username", "email", "password", "status", "created_at" FROM m_customer WHERE email = $1
 `
 
 type GetCustomerByEmailRow struct {
-	ID       uuid.UUID    `json:"id"`
-	Role     Role         `json:"role"`
-	Username string       `json:"username"`
-	Email    string       `json:"email"`
-	Password string       `json:"password"`
-	Status   CustomerEnum `json:"status"`
+	ID        uuid.UUID    `json:"id"`
+	Role      Role         `json:"role"`
+	Username  string       `json:"username"`
+	Email     string       `json:"email"`
+	Password  string       `json:"password"`
+	Status    CustomerEnum `json:"status"`
+	CreatedAt time.Time    `json:"created_at"`
 }
 
 func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (GetCustomerByEmailRow, error) {
@@ -142,6 +144,7 @@ func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (GetCust
 		&i.Email,
 		&i.Password,
 		&i.Status,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -173,16 +176,17 @@ func (q *Queries) GetCustomerById(ctx context.Context, id uuid.UUID) (MCustomer,
 }
 
 const getCustomerByUsername = `-- name: GetCustomerByUsername :one
-SELECT "id", "role", "username", "email", "password", "status" FROM m_customer WHERE username = $1
+SELECT "id", "role", "username", "email", "password", "status", "created_at" FROM m_customer WHERE username = $1
 `
 
 type GetCustomerByUsernameRow struct {
-	ID       uuid.UUID    `json:"id"`
-	Role     Role         `json:"role"`
-	Username string       `json:"username"`
-	Email    string       `json:"email"`
-	Password string       `json:"password"`
-	Status   CustomerEnum `json:"status"`
+	ID        uuid.UUID    `json:"id"`
+	Role      Role         `json:"role"`
+	Username  string       `json:"username"`
+	Email     string       `json:"email"`
+	Password  string       `json:"password"`
+	Status    CustomerEnum `json:"status"`
+	CreatedAt time.Time    `json:"created_at"`
 }
 
 func (q *Queries) GetCustomerByUsername(ctx context.Context, username string) (GetCustomerByUsernameRow, error) {
@@ -195,6 +199,7 @@ func (q *Queries) GetCustomerByUsername(ctx context.Context, username string) (G
 		&i.Email,
 		&i.Password,
 		&i.Status,
+		&i.CreatedAt,
 	)
 	return i, err
 }

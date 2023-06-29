@@ -17,6 +17,7 @@ type Querier interface {
 	CreateCustomer(ctx context.Context, arg CreateCustomerParams) (MCustomer, error)
 	CreateMerchant(ctx context.Context, arg CreateMerchantParams) (MMerchant, error)
 	CreateTransactionHistory(ctx context.Context, arg CreateTransactionHistoryParams) (TransactionHistory, error)
+	GetAccountByCustomerID(ctx context.Context, customerID uuid.UUID) (MAccount, error)
 	GetAccountByNumber(ctx context.Context, number string) (MAccount, error)
 	GetAllCustomers(ctx context.Context, arg GetAllCustomersParams) ([]MCustomer, error)
 	GetAllMerchants(ctx context.Context) ([]MMerchant, error)
@@ -26,7 +27,7 @@ type Querier interface {
 	GetMerchantById(ctx context.Context, id uuid.UUID) (MMerchant, error)
 	GetMerchantByName(ctx context.Context, name string) (MMerchant, error)
 	GetTransactionHistory(ctx context.Context, fromAccountID uuid.UUID) ([]TransactionHistory, error)
-	GetTransactionHistoryByType(ctx context.Context, transactionType TransactionType) ([]TransactionHistory, error)
+	GetTransactionHistoryByType(ctx context.Context, arg GetTransactionHistoryByTypeParams) ([]TransactionHistory, error)
 	UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (MCustomer, error)
 	UpdateMerchant(ctx context.Context, arg UpdateMerchantParams) error
 }

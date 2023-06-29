@@ -12,6 +12,8 @@ type Repository interface {
 	Querier
 	TransferTx(ctx context.Context, arg TranferTxParams) (TransferTxResult, error)
 	PaymentTx(ctx context.Context, arg PaymentTxParams) (PaymentTxResult, error)
+	WithdrawalTx(ctx context.Context, args WithdrawalParams) (WithdrawalResult, error)
+	TopupTx(ctx context.Context, args TopupParams) (TopupResult, error)
 }
 
 type repository struct {
@@ -163,5 +165,89 @@ func (repo *repository) PaymentTx(ctx context.Context, arg PaymentTxParams) (Pay
 		return err
 	})
 
+	return result, err
+}
+
+type TopupParams struct {
+	ToAccountId uuid.UUID `json:"to_account_id"`
+	Amount      float64   `json:"amount"`
+	Description string    `json:"description"`
+}
+
+type TopupResult struct {
+	TransactionID uuid.UUID `json:"to_account_id"`
+	Account       MAccount  `json:"account"`
+}
+
+// TopupTx implements Repositories.
+func (repo *repository) TopupTx(ctx context.Context, args TopupParams) (TopupResult, error) {
+	var result TopupResult
+	err := repo.execTx(ctx, func(q *Queries) error {
+		var err error
+		result.Account, err = q.AddAccountBalance(ctx, AddAccountBalanceParams{
+			Balance: args.Amount,
+			ID:      args.ToAccountId,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		trx, err := q.CreateTransactionHistory(ctx, CreateTransactionHistoryParams{
+			TransactionType: TransactionTypeTopup,
+			ToAccountID: uuid.NullUUID{
+				UUID:  args.ToAccountId,
+				Valid: true,
+			},
+			Amount:      args.Amount,
+			Description: args.Description,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		result.TransactionID = trx.ID
+		return err
+	})
+	return result, err
+}
+
+type WithdrawalParams struct {
+	FromAccountID uuid.UUID `json:"from_account_id"`
+	Amount        float64   `json:"amount"`
+	Description   string    `json:"description"`
+}
+
+type WithdrawalResult struct {
+	TransactionID uuid.UUID `json:"to_account_id"`
+	Account       MAccount  `json:"account"`
+}
+
+// WithdrawalTx implements Repositories.
+func (repo *repository) WithdrawalTx(ctx context.Context, args WithdrawalParams) (WithdrawalResult, error) {
+	var result WithdrawalResult
+	err := repo.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.Account, err = q.AddAccountBalance(ctx, AddAccountBalanceParams{
+			Balance: args.Amount,
+			ID:      args.FromAccountID,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		trx, err := q.CreateTransactionHistory(ctx, CreateTransactionHistoryParams{
+			TransactionType: TransactionTypeWithdrawal,
+			FromAccountID:   args.FromAccountID,
+			Amount:          args.Amount,
+			Description:     args.Description,
+		})
+
+		result.TransactionID = trx.ID
+		return err
+	})
 	return result, err
 }

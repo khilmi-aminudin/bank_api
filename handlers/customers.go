@@ -56,7 +56,6 @@ func (h *customerHandler) CreateCustomer(c *gin.Context) {
 	hashedPassword, _ := utils.HashPassword(req.Password)
 
 	data, err := h.service.CreateCustomer(c, m.CreateCustomerParams{
-		IDCardType:   m.IDCardType(req.IDCardType),
 		IDCardNumber: req.IDCardNumber,
 		IDCardFile:   req.IDCardFile,
 		FirstName:    req.FirstName,

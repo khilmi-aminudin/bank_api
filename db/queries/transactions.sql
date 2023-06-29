@@ -16,5 +16,5 @@ WHERE from_account_id = $1;
 
 -- name: GetTransactionHistoryByType :many
 SELECT * FROM transaction_history 
-WHERE transaction_type = $1;
+WHERE transaction_type = $1 AND from_account_id = $2;
 

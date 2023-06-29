@@ -16,3 +16,7 @@ RETURNING *;
 -- name: GetAccountByNumber :one
 SELECT * FROM m_account 
 WHERE "number" = $1;
+
+-- name: GetAccountByCustomerID :one
+SELECT * FROM m_account 
+WHERE "customer_id" = $1;

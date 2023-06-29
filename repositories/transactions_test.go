@@ -60,9 +60,14 @@ func TestGetTransactionHistory(t *testing.T) {
 }
 
 func TestGetTransactionHistoryByType(t *testing.T) {
-	_ = createRandomTransactionHistory(t, string(TransactionTypeTransfer))
+	account := createRandomTransactionHistory(t, string(TransactionTypeTransfer))
 
-	transactions, err := testRepo.GetTransactionHistoryByType(context.Background(), TransactionTypeTransfer)
+	arg := GetTransactionHistoryByTypeParams{
+		TransactionType: account.TransactionType,
+		FromAccountID:   account.ID,
+	}
+
+	transactions, err := testRepo.GetTransactionHistoryByType(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotZero(t, len(transactions))
 

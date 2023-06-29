@@ -104,3 +104,11 @@ ALTER TABLE "transaction_history" ADD FOREIGN KEY ("from_account_id") REFERENCES
 ALTER TABLE "transaction_history" ADD FOREIGN KEY ("to_account_id") REFERENCES "m_account" ("id");
 
 ALTER TABLE "transaction_history" ADD FOREIGN KEY ("to_merchant_id") REFERENCES "m_merchant" ("id");
+
+-- create admin customer/user
+    -- "username" : "admin",
+    -- "password" : "admin123Dev"
+INSERT INTO m_customer
+("role","first_name", "last_name", "phone_number", "email", "username", "password")
+VALUES
+('admin','dev','admin','080088000808','admin@dev.com','admin','$2a$10$26HYIguUqwVFmAEtETpCc.0bcLAjjM6vgJCWnTDvqvmqRjIzTsAye');

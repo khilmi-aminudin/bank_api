@@ -39,6 +39,9 @@ func (s *customerService) UpdateCustomer(ctx context.Context, args repositories.
 
 // CreateCustomer implements CustomerService.
 func (s *customerService) CreateCustomer(ctx context.Context, args repositories.CreateCustomerParams) (repositories.MCustomer, error) {
+	if args.IDCardType == "" {
+		args.IDCardType = repositories.IDCardTypeKTP
+	}
 	customer, err := s.repository.CreateCustomer(ctx, args)
 	return customer, err
 }
