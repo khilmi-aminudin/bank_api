@@ -37,19 +37,23 @@ type createMerchantRequest struct {
 
 // CreateMerchant implements MerchantHandler.
 func (h *merchantHandler) CreateMerchant(c *gin.Context) {
+	logger.Info("CALLED: CreateMerchant(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	if payload.Role != string(m.RoleAdmin) {
+		logger.Errorln("CALLED : if payload.Role != string(m.RoleAdmin) , Error: Unauthorized")
 		c.JSON(responseUnauthorized("Unauthorized"))
 		return
 	}
 
 	var req createMerchantRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -61,6 +65,7 @@ func (h *merchantHandler) CreateMerchant(c *gin.Context) {
 	}
 	merchant, err := h.service.CreateMerchant(c, arg)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.CreateMerchant(c, arg) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -80,14 +85,17 @@ func (h *merchantHandler) CreateMerchant(c *gin.Context) {
 
 // GetAllMerchants implements MerchantHandler.
 func (h *merchantHandler) GetAllMerchants(c *gin.Context) {
+	logger.Info("CALLED: GetAllMerchants(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	data, err := h.service.GetAllMerchants(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetAllMerchants(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -125,20 +133,24 @@ type getMerchantByNameRequest struct {
 
 // GetMerchantByName implements MerchantHandler.
 func (h *merchantHandler) GetMerchantByName(c *gin.Context) {
+	logger.Info("CALLED: GetMerchantByName(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	var req getMerchantByNameRequest
 	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED :  c.ShouldBindUri(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	merchant, err := h.service.GetMerchantByName(c, req.MerchantName)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetMerchantByName(c, req.MerchantName), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -170,25 +182,30 @@ type updateMerchantRequest struct {
 
 // UpdateMerchant implements MerchantHandler.
 func (h *merchantHandler) UpdateMerchant(c *gin.Context) {
+	logger.Info("CALLED: UpdateMerchant(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	if payload.Role != string(m.RoleAdmin) {
+		logger.Errorln("CALLED : if payload.Role != string(m.RoleAdmin) , Error: Unauthorized")
 		c.JSON(responseUnauthorized("Unauthorized"))
 		return
 	}
 
 	var req updateMerchantRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	merchant, err := h.service.GetMerchantByName(c, req.Name)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetMerchantByName(c, req.Name) , Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
@@ -201,6 +218,7 @@ func (h *merchantHandler) UpdateMerchant(c *gin.Context) {
 	}
 
 	if err := h.service.UpdateMerchant(c, args); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.UpdateMerchant(c, args) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}

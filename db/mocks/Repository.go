@@ -160,6 +160,54 @@ func (_m *Repository) CreateTransactionHistory(ctx context.Context, arg reposito
 	return r0, r1
 }
 
+// GetAccountByCustomerID provides a mock function with given fields: ctx, customerID
+func (_m *Repository) GetAccountByCustomerID(ctx context.Context, customerID uuid.UUID) (repositories.MAccount, error) {
+	ret := _m.Called(ctx, customerID)
+
+	var r0 repositories.MAccount
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (repositories.MAccount, error)); ok {
+		return rf(ctx, customerID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) repositories.MAccount); ok {
+		r0 = rf(ctx, customerID)
+	} else {
+		r0 = ret.Get(0).(repositories.MAccount)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, customerID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetAccountByNumber provides a mock function with given fields: ctx, number
+func (_m *Repository) GetAccountByNumber(ctx context.Context, number string) (repositories.MAccount, error) {
+	ret := _m.Called(ctx, number)
+
+	var r0 repositories.MAccount
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (repositories.MAccount, error)); ok {
+		return rf(ctx, number)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) repositories.MAccount); ok {
+		r0 = rf(ctx, number)
+	} else {
+		r0 = ret.Get(0).(repositories.MAccount)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, number)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetAllCustomers provides a mock function with given fields: ctx, arg
 func (_m *Repository) GetAllCustomers(ctx context.Context, arg repositories.GetAllCustomersParams) ([]repositories.MCustomer, error) {
 	ret := _m.Called(ctx, arg)
@@ -308,23 +356,23 @@ func (_m *Repository) GetMerchantById(ctx context.Context, id uuid.UUID) (reposi
 	return r0, r1
 }
 
-// GetMerchantByName provides a mock function with given fields: ctx, name
-func (_m *Repository) GetMerchantByName(ctx context.Context, name string) (repositories.MMerchant, error) {
-	ret := _m.Called(ctx, name)
+// GetMerchantByName provides a mock function with given fields: ctx, lower
+func (_m *Repository) GetMerchantByName(ctx context.Context, lower string) (repositories.MMerchant, error) {
+	ret := _m.Called(ctx, lower)
 
 	var r0 repositories.MMerchant
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) (repositories.MMerchant, error)); ok {
-		return rf(ctx, name)
+		return rf(ctx, lower)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string) repositories.MMerchant); ok {
-		r0 = rf(ctx, name)
+		r0 = rf(ctx, lower)
 	} else {
 		r0 = ret.Get(0).(repositories.MMerchant)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, name)
+		r1 = rf(ctx, lower)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -358,25 +406,25 @@ func (_m *Repository) GetTransactionHistory(ctx context.Context, fromAccountID u
 	return r0, r1
 }
 
-// GetTransactionHistoryByType provides a mock function with given fields: ctx, transactionType
-func (_m *Repository) GetTransactionHistoryByType(ctx context.Context, transactionType repositories.TransactionType) ([]repositories.TransactionHistory, error) {
-	ret := _m.Called(ctx, transactionType)
+// GetTransactionHistoryByType provides a mock function with given fields: ctx, arg
+func (_m *Repository) GetTransactionHistoryByType(ctx context.Context, arg repositories.GetTransactionHistoryByTypeParams) ([]repositories.TransactionHistory, error) {
+	ret := _m.Called(ctx, arg)
 
 	var r0 []repositories.TransactionHistory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repositories.TransactionType) ([]repositories.TransactionHistory, error)); ok {
-		return rf(ctx, transactionType)
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.GetTransactionHistoryByTypeParams) ([]repositories.TransactionHistory, error)); ok {
+		return rf(ctx, arg)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repositories.TransactionType) []repositories.TransactionHistory); ok {
-		r0 = rf(ctx, transactionType)
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.GetTransactionHistoryByTypeParams) []repositories.TransactionHistory); ok {
+		r0 = rf(ctx, arg)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]repositories.TransactionHistory)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repositories.TransactionType) error); ok {
-		r1 = rf(ctx, transactionType)
+	if rf, ok := ret.Get(1).(func(context.Context, repositories.GetTransactionHistoryByTypeParams) error); ok {
+		r1 = rf(ctx, arg)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -408,6 +456,30 @@ func (_m *Repository) PaymentTx(ctx context.Context, arg repositories.PaymentTxP
 	return r0, r1
 }
 
+// TopupTx provides a mock function with given fields: ctx, args
+func (_m *Repository) TopupTx(ctx context.Context, args repositories.TopupParams) (repositories.TopupResult, error) {
+	ret := _m.Called(ctx, args)
+
+	var r0 repositories.TopupResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.TopupParams) (repositories.TopupResult, error)); ok {
+		return rf(ctx, args)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.TopupParams) repositories.TopupResult); ok {
+		r0 = rf(ctx, args)
+	} else {
+		r0 = ret.Get(0).(repositories.TopupResult)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, repositories.TopupParams) error); ok {
+		r1 = rf(ctx, args)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // TransferTx provides a mock function with given fields: ctx, arg
 func (_m *Repository) TransferTx(ctx context.Context, arg repositories.TranferTxParams) (repositories.TransferTxResult, error) {
 	ret := _m.Called(ctx, arg)
@@ -432,6 +504,30 @@ func (_m *Repository) TransferTx(ctx context.Context, arg repositories.TranferTx
 	return r0, r1
 }
 
+// UpdateCustomer provides a mock function with given fields: ctx, arg
+func (_m *Repository) UpdateCustomer(ctx context.Context, arg repositories.UpdateCustomerParams) (repositories.MCustomer, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 repositories.MCustomer
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.UpdateCustomerParams) (repositories.MCustomer, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.UpdateCustomerParams) repositories.MCustomer); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(repositories.MCustomer)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, repositories.UpdateCustomerParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateMerchant provides a mock function with given fields: ctx, arg
 func (_m *Repository) UpdateMerchant(ctx context.Context, arg repositories.UpdateMerchantParams) error {
 	ret := _m.Called(ctx, arg)
@@ -444,6 +540,30 @@ func (_m *Repository) UpdateMerchant(ctx context.Context, arg repositories.Updat
 	}
 
 	return r0
+}
+
+// WithdrawalTx provides a mock function with given fields: ctx, args
+func (_m *Repository) WithdrawalTx(ctx context.Context, args repositories.WithdrawalParams) (repositories.WithdrawalResult, error) {
+	ret := _m.Called(ctx, args)
+
+	var r0 repositories.WithdrawalResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.WithdrawalParams) (repositories.WithdrawalResult, error)); ok {
+		return rf(ctx, args)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, repositories.WithdrawalParams) repositories.WithdrawalResult); ok {
+		r0 = rf(ctx, args)
+	} else {
+		r0 = ret.Get(0).(repositories.WithdrawalResult)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, repositories.WithdrawalParams) error); ok {
+		r1 = rf(ctx, args)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 type mockConstructorTestingTNewRepository interface {

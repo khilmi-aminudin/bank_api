@@ -1,6 +1,12 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/khilmi-aminudin/bank_api/utils"
+)
+
+var logger = utils.GetLogger()
 
 type webResponse struct {
 	Code    int         `json:"code"`

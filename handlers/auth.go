@@ -63,25 +63,30 @@ func newCustomerResponse(cst m.GetCustomerByUsernameRow) customerResponse {
 
 // Login implements AuthHandler.
 func (h *authHandler) Login(c *gin.Context) {
+	logger.Info("CALLED : Login(c *gin.Context)")
 	var req loginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerSvc.GetCustomerByUsername(c, req.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerSvc.GetCustomerByUsername(c, req.Username), Error: %v", err))
 		c.JSON(responseNotFound(fmt.Sprintf("user %s not found", req.Username)))
 		return
 	}
 
 	if cstData.Status != m.CustomerEnumActive && cstData.Status != m.CustomerEnumPending {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerSvc.GetCustomerByUsername(c, req.Username), Error: user %s is %s", req.Username, string(cstData.Status)))
 		c.JSON(responseForbidden(fmt.Sprintf("user %s is %s", req.Username, string(cstData.Status))))
 		return
 	}
 
 	err = utils.CheckPassword(req.Password, cstData.Password)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : utils.CheckPassword(req.Password, cstData.Password), Error: %v", err))
 		c.JSON(responseUnauthorized(err.Error()))
 		return
 	}
@@ -91,6 +96,11 @@ func (h *authHandler) Login(c *gin.Context) {
 		h.config.AccessTokenDuration,
 	)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf(`CALLED : h.tokenMaker.CreateToken(
+			req.Username,
+			string(cstData.Role),
+			h.config.AccessTokenDuration,
+		), Error: %v`, err))
 		c.JSON(responseInternalServerError(err.Error()))
 		return
 	}
@@ -100,6 +110,11 @@ func (h *authHandler) Login(c *gin.Context) {
 		h.config.RefreshTokenDuration,
 	)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf(`CALLED : h.tokenMaker.CreateToken(
+			req.Username,
+			string(cstData.Role),
+			h.config.AccessTokenDuration,
+		), Error: %v`, err))
 		c.JSON(responseInternalServerError(err.Error()))
 		return
 	}

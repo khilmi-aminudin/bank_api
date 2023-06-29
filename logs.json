@@ -1,0 +1,19 @@
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:18:57+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:21:41+07:00"}
+{"level":"error","msg":"{handlers Login(c *gin.Context) -\u003e c.ShouldBindJSON(\u0026req) Key: 'loginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag Key: 'loginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag}","time":"2023-06-29T21:21:53+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:28:39+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:28:44+07:00"}
+{"level":"info","msg":"{handlers Login  \u003cnil\u003e}","time":"2023-06-29T21:28:48+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:29:57+07:00"}
+{"level":"info","msg":"{handlers Login  \u003cnil\u003e}","time":"2023-06-29T21:30:00+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:31:53+07:00"}
+{"level":"info","msg":"{handlers Login  \u003cnil\u003e}","time":"2023-06-29T21:31:59+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:35:03+07:00"}
+{"level":"info","msg":"handlerlogin","time":"2023-06-29T21:35:06+07:00"}
+{"level":"error","msg":"","time":"2023-06-29T21:35:06+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:40:18+07:00"}
+{"level":"info","msg":"Login(c *gin.Context)","time":"2023-06-29T21:40:21+07:00"}
+{"level":"error","msg":"CALLED : c.ShouldBindJSON(\u0026req), Error: Key: 'loginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag","time":"2023-06-29T21:40:21+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-29T21:41:06+07:00"}
+{"level":"info","msg":"Login(c *gin.Context)","time":"2023-06-29T21:41:10+07:00"}
+{"level":"error","msg":"CALLED : c.ShouldBindJSON(\u0026req), Error: Key: 'loginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag","time":"2023-06-29T21:41:10+07:00"}

@@ -20,13 +20,13 @@ type AccountHandler interface {
 
 type accountHandler struct {
 	service         services.AccoountService
-	customerservice services.CustomerService
+	customerService services.CustomerService
 }
 
-func NewAccountHandler(service services.AccoountService, customerservice services.CustomerService) AccountHandler {
+func NewAccountHandler(service services.AccoountService, customerService services.CustomerService) AccountHandler {
 	return &accountHandler{
 		service:         service,
-		customerservice: customerservice,
+		customerService: customerService,
 	}
 }
 
@@ -36,14 +36,17 @@ type createAccountRequest struct {
 
 // CreateAccount implements AccountHandler.
 func (h *accountHandler) CreateAccount(c *gin.Context) {
+	logger.Info("CALLED : CreateAccount(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	cstData, err := h.customerservice.GetCustomerByUsername(c, payload.Username)
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
@@ -56,6 +59,7 @@ func (h *accountHandler) CreateAccount(c *gin.Context) {
 	var req createAccountRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -80,33 +84,39 @@ type getAccountRequest struct {
 
 // GetAccountByNumber implements AccountHandler.
 func (h *accountHandler) GetAccountByNumber(c *gin.Context) {
+	logger.Info("CALLED : GetAccountByNumber(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
-	cstData, err := h.customerservice.GetCustomerByUsername(c, payload.Username)
+	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	var req getAccountRequest
 	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED :  c.ShouldBindUri(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	data, err := h.service.GetAccountByNumber(c, req.AccountNumber)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetAccountByNumber(c, req.AccountNumber), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	if data.CustomerID != cstData.ID {
-		cst, err := h.customerservice.GetCustomerById(c, data.CustomerID)
+		cst, err := h.customerService.GetCustomerById(c, data.CustomerID)
 		if err != nil {
+			logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerById(c, data.CustomerID), Error: %v", err))
 			c.JSON(responseBadRequest(err.Error()))
 			return
 		}

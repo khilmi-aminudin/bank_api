@@ -44,25 +44,28 @@ func NewTransactionHandler(
 func (h *transactionHandler) GetTransactionHistory(c *gin.Context) {
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByCustomerId(c, cstData.ID), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	data, err := h.trxservice.GetTransactionHistory(c, fromAccount.ID)
-
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.GetTransactionHistory(c, fromAccount.ID), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -79,24 +82,28 @@ func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
 	fmt.Println("CALLED")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByCustomerId(c, cstData.ID), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	var req getTransactionHistoryByTypeRequest
 	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED :  c.ShouldBindUri(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -108,6 +115,7 @@ func (h *transactionHandler) GetTransactionHistoryByType(c *gin.Context) {
 
 	data, err := h.trxservice.GetTransactionHistoryByType(c, args)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.GetTransactionHistoryByType(c, args), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -126,25 +134,28 @@ type createPaymentRequest struct {
 func (h *transactionHandler) PaymentTx(c *gin.Context) {
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByCustomerId(c, cstData.ID), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	var req createPaymentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-
+		logger.Errorln(fmt.Sprintf("CALLED :  c.ShouldBindJSON(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -156,6 +167,7 @@ func (h *transactionHandler) PaymentTx(c *gin.Context) {
 
 	merchant, err := h.merchantService.GetMerchantByName(c, req.ToMerchant)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.merchantService.GetMerchantByName(c, req.ToMerchant), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
@@ -169,6 +181,7 @@ func (h *transactionHandler) PaymentTx(c *gin.Context) {
 
 	data, err := h.trxservice.PaymentTx(c, args)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.PaymentTx(c, args), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -185,6 +198,7 @@ type createTopupRequest struct {
 func (h *transactionHandler) TopupTx(c *gin.Context) {
 	var req createTopupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -196,6 +210,7 @@ func (h *transactionHandler) TopupTx(c *gin.Context) {
 
 	account, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.AccountNumber))
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByNumber(c, accountNumber), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
@@ -208,6 +223,7 @@ func (h *transactionHandler) TopupTx(c *gin.Context) {
 
 	data, err := h.trxservice.TopupTx(c, args)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.TopupTx(c, args), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -225,24 +241,28 @@ type createTransferRequest struct {
 func (h *transactionHandler) TransferTx(c *gin.Context) {
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	fromAccount, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByCustomerId(c, cstData.ID), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	var req createTransferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -259,6 +279,7 @@ func (h *transactionHandler) TransferTx(c *gin.Context) {
 
 	toAccount, err := h.accountService.GetAccountByNumber(c, fmt.Sprintf("%d", req.ToAccountNumber))
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByNumber(c, accountNumber), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -272,6 +293,7 @@ func (h *transactionHandler) TransferTx(c *gin.Context) {
 
 	data, err := h.trxservice.TransferTx(c, args)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.TransferTx(c, args), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -288,24 +310,28 @@ type createWithdrawalRequest struct {
 func (h *transactionHandler) WithdrawalTx(c *gin.Context) {
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.customerService.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.customerService.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	account, err := h.accountService.GetAccountByCustomerId(c, cstData.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.accountService.GetAccountByCustomerId(c, cstData.ID), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	var req createWithdrawalRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -328,6 +354,7 @@ func (h *transactionHandler) WithdrawalTx(c *gin.Context) {
 
 	data, err := h.trxservice.WithdrawalTx(c, args)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.trxservice.WithdrawalTx(c, args) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
@@ -49,8 +50,10 @@ type customerCreateRequest struct {
 
 // CreateCustomer implements CustomerHandler.
 func (h *customerHandler) CreateCustomer(c *gin.Context) {
+	logger.Info("CALLED : CreateCustomer(c *gin.Context)")
 	var req customerCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindJSON(&req) , Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -69,6 +72,7 @@ func (h *customerHandler) CreateCustomer(c *gin.Context) {
 	})
 
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.CreateCustomer(c, m.CreateCustomerParams{}), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -87,20 +91,24 @@ type listCustomerRequest struct {
 
 // GetAllCustomers implements CustomerHandler.
 func (h *customerHandler) GetAllCustomers(c *gin.Context) {
+	logger.Info("CALLED : GetAllCustomers(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.service.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	var req listCustomerRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindQuery(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -111,6 +119,7 @@ func (h *customerHandler) GetAllCustomers(c *gin.Context) {
 	})
 
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetAllCustomers(c, m.GetAllCustomersParams{}), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
@@ -139,30 +148,36 @@ type getCustomer struct {
 
 // GetCustomerById implements CustomerHandler.
 func (h *customerHandler) GetCustomerById(c *gin.Context) {
+	logger.Info("CALLED : GetCustomerById(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	if payload.Role != string(m.RoleAdmin) {
+		logger.Errorln("CALLED : if payload.Role != string(m.RoleAdmin) , Error: Unauthorized")
 		c.JSON(responseUnauthorized("Unauthorized"))
 		return
 	}
 
 	var req getCustomer
 	if err := c.ShouldBindUri(&req); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED :  c.ShouldBindUri(&req), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 	parsedID, err := uuid.Parse(req.ID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : uuid.Parse(req.ID), Error: %v", err))
 		c.JSON(responseBadRequest("invalid customer id"))
 		return
 	}
 
 	data, err := h.service.GetCustomerById(c, parsedID)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetCustomerById(c, parsedID), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
@@ -179,26 +194,31 @@ type updateCustomerrequest struct {
 
 // UpdateCustomer implements CustomerHandler.
 func (h *customerHandler) UpdateCustomer(c *gin.Context) {
+	logger.Info("CALLED : UpdateCustomer(c *gin.Context)")
 	payload, err := middleware.GetPayload(c)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : middleware.GetPayload(c), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	cstData, err := h.service.GetCustomerByUsername(c, payload.Username)
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.GetCustomerByUsername(c, payload.Username), Error: %v", err))
 		c.JSON(responseNotFound(err.Error()))
 		return
 	}
 
 	var req updateCustomerrequest
 	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : c.ShouldBindWith(&req, binding.FormMultipart), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
 
 	uploadedFilename, err := h.s3.Upload(c, req.File, "id-cards")
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.s3.Upload(c, req.File, id-cards), Error: %v", err))
 		c.JSON(responseInternalServerError("error uploading id card"))
 		return
 	}
@@ -211,8 +231,8 @@ func (h *customerHandler) UpdateCustomer(c *gin.Context) {
 	}
 
 	data, err := h.service.UpdateCustomer(c, arg)
-
 	if err != nil {
+		logger.Errorln(fmt.Sprintf("CALLED : h.service.UpdateCustomer(c, arg), Error: %v", err))
 		c.JSON(responseBadRequest(err.Error()))
 		return
 	}
