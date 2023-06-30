@@ -17,3 +17,7 @@
 {"level":"info","msg":"Logger initialized","time":"2023-06-29T21:41:06+07:00"}
 {"level":"info","msg":"Login(c *gin.Context)","time":"2023-06-29T21:41:10+07:00"}
 {"level":"error","msg":"CALLED : c.ShouldBindJSON(\u0026req), Error: Key: 'loginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag","time":"2023-06-29T21:41:10+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-30T13:54:59+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-30T13:55:18+07:00"}
+{"level":"info","msg":"Logger initialized","time":"2023-06-30T13:55:40+07:00"}
+{"level":"info","msg":"CALLED : Login(c *gin.Context)","time":"2023-06-30T13:55:46+07:00"}

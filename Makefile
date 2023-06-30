@@ -46,7 +46,10 @@ runserver :
 	go run cmd/main.go
 
 build:
-	docker build -t ewallet .
+	docker build -t bank-api .
+
+runapp:
+	docker run --rm --name bankapi --network="host" -p 8080:8080 bank-api
 
 mock :
 	mockery --name=Repository --dir=./repositories --output=db/mocks --outpkg=mocks
