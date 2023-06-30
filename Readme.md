@@ -66,7 +66,7 @@ Merupakan aplikasi RestAPI bank sederhana dengan fitur sebagai berikkut :
   ```
 - Pastikan anda memiliki postgresql instance
 - Buat database di postgresql 
-- Ubah app.env.example menjadi app.env dan sesuaikan konfigurasi di dalamnya dengan env milik anda
+- Ubah app.env.example menjadi app.env dan sesuaikan konfigurasi di dalamnya dengan env milik anda, serta sesuaikan juga konfigurasi DB_SOURCE didalam Makefile 
 - Menjalankan aplikasi  
   *UNIX/MacOS*
   ``` shell
@@ -74,7 +74,7 @@ Merupakan aplikasi RestAPI bank sederhana dengan fitur sebagai berikkut :
     $ make test
 
     # menjalankan migrasi database
-    $ make createdb && make migrateup
+    $ && make migrateup
 
     # menjalankan aplikasi
     $ make runserver
@@ -93,3 +93,21 @@ Merupakan aplikasi RestAPI bank sederhana dengan fitur sebagai berikkut :
     $ go run cmd/main.go
 
   ```
+- Sebagai catatan, aplikasi ini sudah menerapkan CI untuk testing aplikasi saat di push ke github pada branch main
+
+
+## Dokumentasi API
+- Untuk dokumentasi API telah disediakan postman collection yang dapat di import di Postman atau API Client lainnya.
+- Data di database masih kosong, hanya tersedia  1 user admin dengan username dan password sebagai berikut:
+  ```bash
+    "username" : "admin",
+    "password" : "admin123Dev"
+  ```
+  </br>
+  </br>
+  </br>
+  
+
+
+
+NB : Aplikasi ini masih banyak yang perlu diperbaiki, dimana saya selaku developer menyadari bahwa banyak code yang penempatannya kurang sesuai, dimana banyak Bussines Logic yang masih saya lakukan di Handlers yang seharusnya dilakukan di Service

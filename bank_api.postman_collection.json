@@ -1,0 +1,692 @@
+{
+	"info": {
+		"_postman_id": "8f5e0cee-5685-46ee-8085-8fbe8d38ce3a",
+		"name": "bank_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10756958"
+	},
+	"item": [
+		{
+			"name": "customer",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\" : \"khilmi\",\n    \"last_name\" : \"aminudin\",\n    \"phone_number\": \"082338162885\",\n    \"email\" : \"khilmi@maidl.com\",\n    \"username\" : \"khilmiad\",\n    \"password\" : \"rahasia123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id_card_type",
+									"value": "KTP",
+									"type": "text"
+								},
+								{
+									"key": "id_card_number",
+									"value": "16427152837152378",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/takimi/Pictures/mnc_assesment.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/customers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all customers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVmMzlkOGVmLTg0NTUtNGE5OS1hZDQzLWY2MTBjM2FlODA4NiIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE0OjIyOjIyLjQ5NTM1NjA2KzA3OjAwIiwiZXhwaXJlZF9hdCI6IjIwMjMtMDYtMjlUMTg6MjI6MjIuNDk1MzU2MjMrMDc6MDAifQ.9k9RKZ41mhTfRoRoeU1iBGsGh2a_ZJAwoTj09y2iWjw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "page_id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "page_size",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/customers?page_id=1&page_size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"customers"
+							],
+							"query": [
+								{
+									"key": "page_id",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get customer by id (admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdmOTVjYzg4LTAxZDQtNGY1NC1iNTNkLWRhNjBmNDc2NTE2OCIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE0OjA5OjAzLjA1MjAxNzAxOSswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDE4OjA5OjAzLjA1MjAxNzEwOSswNzowMCJ9.WSHgG5ZjwT-AmOqBsOgx4h8sC9Cxf_rKcY1UlDQ91PI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/customers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "account",
+			"item": [
+				{
+					"name": "create account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"balance\" : 100000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get account number",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIzNWNkZDBkLWI4MjEtNDU4OC1hMTM5LTdhNzE4MjExYWU4NyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE1OjI3OjUxLjI5NTE5MjkxMiswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDE5OjI3OjUxLjI5NTE5MzAwMiswNzowMCJ9.jkIn_8_jmwnARzNPwZ9emlhJ9CRMVPyF1JCLt2eVD2s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/accounts/7748940498",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"7748940498"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"admin\",\n    \"password\" : \"admin123Dev\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "transactions",
+			"item": [
+				{
+					"name": "topup",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0OGJhZjk4LWZlMmYtNDE3Mi1iNzBkLWQ2NjQ2NjI5ZDY5NSIsInVzZXJuYW1lIjoia2hpbG1pYUFtIiwicm9sZSI6InVzZXIiLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE0OjI1OjMyLjM0MzcxMjE5MiswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDE4OjI1OjMyLjM0MzcxMjI2MyswNzowMCJ9.gR3U4qU-DS0k-_tnfm1-6LH-QzSx_1104g4b8lsYyJQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_number\" : 5334464291,\n    \"amount\" : 50000,\n    \"description\" : \"top up via merchant    \"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/topup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "transfer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZmNmM2MjNhLTEwMGUtNDBiYi04MjU1LWExYWJjMWU3NmFlYyIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxNTo0OTo0MS43MzQ4Nzg3NzQrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQxOTo0OTo0MS43MzQ4Nzg5NDQrMDc6MDAifQ.ZJ5rgSYfRj7Sy_JGowPjvos6lBoz9eODI9FCbjKLelo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to_account_number\" : 5334464291,\n    \"amount\" : 50000,\n    \"description\" : \"top up via merchant    \"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/transfer",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"transfer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "withdrawal",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\" : 100000,\n    \"description\" : \"withdraw via merchant    \"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/withdraw",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pay to a merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to_merchant\" : \"setoko\",\n    \"amount\" : 50000,\n    \"description\" : \"nice product\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/pay",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get transactions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/history",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get transactions by  type",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlmMmQzYzM2LTk0ZjktNGMwMC05NTdjLWJjNDEzZTdlYmM2MSIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowNjoxOS4wNTMxMjQ5MDMrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowNjoxOS4wNTMxMjUwMDMrMDc6MDAifQ.mULDSR-zHdgqFjuwWT7gNLWVhGYZhvri1ltKTnptdGc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions/history-type/topup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"history-type",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "merchant",
+			"item": [
+				{
+					"name": "create merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkMWI1YjBjLTcxYmYtNDE0MS1iNTJhLWI4MTJiMDlhOGI3YSIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE4OjQxOjMyLjYyNDQyODgwOCswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDIyOjQxOjMyLjYyNDQyOTM1OSswNzowMCJ9.QPUzB-8W8yIdLa4nEKko76ujHx6WWCf_DKP3Cx0wFZs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/merchants",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"merchants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkMWI1YjBjLTcxYmYtNDE0MS1iNTJhLWI4MTJiMDlhOGI3YSIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE4OjQxOjMyLjYyNDQyODgwOCswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDIyOjQxOjMyLjYyNDQyOTM1OSswNzowMCJ9.QPUzB-8W8yIdLa4nEKko76ujHx6WWCf_DKP3Cx0wFZs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"setoko\",\n    \"address\" : \"Jakarta Barat\",\n    \"website\" : \"http://www.setoko.co.id/\",\n    \"email\" : \"setoko02@mail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/merchants",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"merchants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get merchant by name",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNjYWI0MjVkLWRiNDctNGE0Yy05MjM1LWNlNmUyZjk1NjgwOCIsInVzZXJuYW1lIjoiZGV3aWZlYiIsInJvbGUiOiJ1c2VyIiwiaXNzdWVkX2F0IjoiMjAyMy0wNi0yOVQxOTowMjowMS4xMzY0NzYwMDcrMDc6MDAiLCJleHBpcmVkX2F0IjoiMjAyMy0wNi0yOVQyMzowMjowMS4xMzY0NzYxNzgrMDc6MDAifQ.KFJNd6h7sxpdboDSJ_8_eOp2FSo9oOaFsUXdYoqdwcs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/merchants/setoko",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"merchants",
+								"setoko"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMxYmE0ZDE0LWM1MWItNDNjYi1iMjkxLTg5NmJmN2M1YmE0NyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpc3N1ZWRfYXQiOiIyMDIzLTA2LTI5VDE5OjA1OjIzLjc2OTMwODU3MyswNzowMCIsImV4cGlyZWRfYXQiOiIyMDIzLTA2LTI5VDIzOjA1OjIzLjc2OTMwODY3MyswNzowMCJ9.0MXfd99p1mQolqZx6tvI_KlcGRxBSuUJpydcYhD6vmE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/merchants",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"merchants"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
